@@ -28,12 +28,14 @@ class EnergyAnalysis:
         Class constructor to inizialize the attributes of the class.
     """
 
+
     def __init__(self, url: str, output_file: str):
         self.url = url
         self.output_file = output_file
         self.df = None
 
-    # method 1 --> download file and read the csv to df attribute the pandas dataframe.
+
+    #method 1 --> download file and read the csv to df attribute the pandas dataframe.
     def download_file(self):
         """
         Downloads a file from the object.url address into your hard drive and read the dataset into the df attribute which it is a pandas dataframe.
@@ -54,7 +56,7 @@ class EnergyAnalysis:
         """
         try:
             # If file doesn't exist, download it. Else, print a warning message.
-            fullfilename = os.path.join("./downloads/" + self.output_file)
+            fullfilename = os.path.join("./downloads/"+self.output_file)
             if not os.path.exists(fullfilename):
                 print(urlretrieve(self.url, filename=fullfilename))
             else:
@@ -68,3 +70,26 @@ class EnergyAnalysis:
     # method 2 --> list all the available countries
     def list_countries(self):
         return self.df["country"].unique()
+
+    # method 3 -->
+    def show_consumption(self, country, normalize):
+        if country in self.df.country.unique():
+            aux = self.df[(self.df["country"] == country)]
+            # selects the "_consumption" columns
+            cols = [col for col in self.df.columns if "_consumption" in col]
+
+            aux = aux.fillna(value=0)
+
+            norm = aux[cols]
+            norm
+            # normalize the consumptions values to percentages
+            norm[cols] = norm[cols].apply(lambda x: (x / x.sum()) * 100, axis=1)
+            x = norm
+            x["year"] = aux["year"]
+
+            # plot
+            plt.style.use("seaborn")
+            x.plot.area(x="year")
+            plt.show()
+        else:
+            raise ValueError("Country does not exist.")
