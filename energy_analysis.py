@@ -8,7 +8,27 @@ import seaborn as sns
 
 
 class EnergyAnalysis:
-    def __init__(self, url, output_file):
+    """
+    Class that controls all class methods and finally
+    delivers the requested information.
+    It analyses energy data.
+
+    Attributes
+    ----------------
+    url: str
+        The url for the requested file
+    output_file: str
+        Desired name to the file
+    df: pandas.DataFrame
+        The padas dataframe with the content of the file downloaded
+
+    Methods
+    ----------------
+    __init__: Init method
+        Class constructor to inizialize the attributes of the class.
+    """
+
+    def __init__(self, url: str, output_file: str):
         self.url = url
         self.output_file = output_file
         self.df = None
@@ -20,6 +40,8 @@ class EnergyAnalysis:
 
         Parameters
         -----------
+        None
+
 
         Returns
         ---------
