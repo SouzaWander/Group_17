@@ -26,10 +26,27 @@ class EnergyAnalysis:
     ----------------
     __init__: Init method
         Class constructor to inizialize the attributes of the class.
+
+    download_file: Download method
+        Download a file base on the url strored in the object of the class,
+        and reurns a pandas dataframe with the data
     """
 
 
     def __init__(self, url: str, output_file: str):
+        """
+        Class constructor to inizialize the attributes of the class.
+
+        Parameters
+        ----------------
+        url: str
+            The url for the requested file
+        output_file: str
+            The name of the output file
+        df: pandas dataframe
+            The columns included in the correlation matrix
+        """
+
         self.url = url
         self.output_file = output_file
         self.df = None
@@ -47,7 +64,7 @@ class EnergyAnalysis:
 
         Returns
         ---------
-        Nothing
+        dataset: pandas dataframe
 
 
         Example
@@ -69,11 +86,55 @@ class EnergyAnalysis:
 
     # method 2 --> list all the available countries
     def list_countries(self):
-        return self.df["country"].unique()
+        """
+        Returns a list of all available countries in the dataset
+
+        Parameter
+        ----------------
+        None
+
+        Raises
+        -----------------
+        None
+
+        Returns
+        -----------------
+        Array
+        """
+        region_list = ['Africa','Asia Pacific','CIS','Central America',
+       'Eastern Africa','Europe', 'Europe (other)','Middle Africa',
+       'Middle East',
+       'North America', 'OPEC',
+       'Other Asia & Pacific', 'Other CIS', 'Other Caribbean',
+       'Other Middle East', 'Other Northern Africa',
+       'Other South America', 'Other Southern Africa',
+       'South & Central America','USSR','Western Africa', 'Western Sahara',
+       'World']
+        return self.df[(~self.df["country"].isin(region_list))].country.unique()
 
     # method 3 -->
-    def show_consumption(self, country, normalize):
-        if country in self.df.country.unique():
+    def show_consumption(self, country:str , normalize:bool):
+        """
+        Plots the normalized or not normalized consumptions of the past years of a given country.
+
+        Parameter
+        ----------------
+        country: str
+        Name of the country that we want to analyze the consumption.
+
+        normalize: bool
+        Option if we want or not to normalize the consuption data.
+
+        Raises
+        -----------------
+        ValueError
+        If the country is not present on teh dataset
+
+        Returns
+        -----------------
+        None
+        """
+        if country in self.list_countries():
             aux = self.df[(self.df["country"] == country)]
             # selects the "_consumption" columns
             cols = [col for col in self.df.columns if "_consumption" in col]
@@ -83,10 +144,10 @@ class EnergyAnalysis:
             norm = aux[cols]
             norm
             # normalize the consumptions values to percentages
-            norm[cols] = norm[cols].apply(lambda x: (x / x.sum()) * 100, axis=1)
+            if(normalize):
+                norm[cols] = norm[cols].apply(lambda x: (x / x.sum()) * 100, axis=1)
             x = norm
             x["year"] = aux["year"]
-
             # plot
             plt.style.use("seaborn")
             x.plot.area(x="year")
