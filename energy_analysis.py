@@ -154,3 +154,98 @@ class EnergyAnalysis:
             plt.show()
         else:
             raise ValueError("Country does not exist.")
+
+     # method 6 -->
+
+
+    def gapminder(self,y):
+        
+        """
+        Plots a scatter Plot comparing the Gdp of each country and its Total Energy Consumption of a given year.
+        The population of each country can also be compared by the size of the data points.
+        
+        Parameter
+        _______________
+        
+        year: int
+        Year that we want to analyse countries' GDP and Total Energy Consumption
+        
+        
+        Raises
+        -----------------
+        ValueError
+        If the input given is not an 'int'
+
+        Returns
+        -----------------
+        Scatter plot
+        
+        """
+    
+    
+        #From the Dataset only the columns of the problem were Selected
+        dataframe = self.df.filter(regex='year|country|population|consumption|gdp') 
+
+        dataframe['total_consumption']= dataframe[list(dataframe.filter(regex='_consumption'))].sum(axis=1)
+
+
+        #Define the size of the plot for better visualization
+        fig = plt.figure(figsize=(20, 15))
+
+        year = dataframe[dataframe['year'] == y]
+    
+
+        if type(y) != int:
+            raise TypeError("Variable 'y' is not int.")
+
+        else:
+
+            # x-axis values
+            x = year['gdp']
+            # y-axis values
+            y = year['total_consumption']
+            p = year['population']
+            #size = [2*n for n in range(len(p))]
+            size = year['population']
+
+            # plotting points as a scatter plot
+            plt.scatter(x, y, label= "Population Size",edgecolors = 'black',marker= "o",lw = 1,
+                        c=year.population,s=year.population/2**18)
+
+
+            plt.colorbar(label='Total Energy Consumption',shrink=1)
+            plt.tick_params(labelsize=20)
+
+            # x-axis label
+            plt.xlabel('GDP',fontsize = 20)
+            # x-axis label
+            plt.ylabel('Total Energy Consumption',fontsize = 20)
+            # plot title
+            plt.title('Countries GDP and Energy Consumption in a given Year',fontsize = 20)
+
+            #Editing the Legend
+            pws = [500000, 10000000, 100000000, 1000000000]
+            for pw in pws:
+                 plt.scatter([], [], s=pw/2**18, c='k',label=str(pw),cmap = 'viridis')
+
+            h, l = plt.gca().get_legend_handles_labels()
+            plt.legend(h[1:], l[1:], labelspacing=1.9, title="Population", borderpad=0.9, 
+                        frameon=True ,framealpha=0.6, edgecolor="blue", facecolor="lightblue",fontsize=20,title_fontsize=25)
+
+
+
+            #Change the X and Y axis scale for better visualization
+            plt.xscale('log')
+            plt.yscale('log')
+
+            plt.grid()
+
+            # function to show the plot
+
+            f = plt.show()
+
+
+
+        return f
+
+     
