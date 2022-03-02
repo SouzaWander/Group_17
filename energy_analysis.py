@@ -175,8 +175,6 @@ class EnergyAnalysis:
         object.consumption_country(["Switzerland", "Portugal", "Chile"])
         """
         
-        #Import the data
-        object.download_file()
 
         #Create a list with all _consumption columns and create a new dataframe
         consumption_list = self.df.filter(like='_consumption').columns
@@ -191,7 +189,7 @@ class EnergyAnalysis:
         
         #Create a dataframe for every country needed and drop NaN
         for i in countries:
-            globals()[i] = consumption[consumption["country"] == i]
+            globals()[i] = consumption_data[consumption_data["country"] == i]
             indexNames = globals()[i][globals()[i]['total'] < 1 ].index
             globals()[i].drop(indexNames , inplace=True)
             
@@ -223,11 +221,8 @@ class EnergyAnalysis:
 
         Example
         ---------
-        object.consumption_country(["Switzerland", "Portugal", "Chile"])
+        object.gdp_country(["Switzerland", "Portugal", "Chile"])
         """
-
-        #Import the data
-        object.download_file()
         
         #Select the columns Country, Year and gdp and create a new dataframe
         gdp_data = self.df[["country","year","gdp"]]
