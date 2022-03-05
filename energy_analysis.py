@@ -70,17 +70,17 @@ class EnergyAnalysis:
         ---------
         object.download_file()
         """
+        fullfilename = os.path.join("./downloads/" + self.output_file)
+        if not os.path.exists("./downloads/"):
+            os.makedirs("./downloads/")
+            urlretrieve(self.url, filename=fullfilename)
+        elif not os.path.exists(fullfilename):
+            urlretrieve(self.url, filename=fullfilename)
+        else:
+
+            print("File already exists!")
         try:
             # If file doesn't exist, download it. Else, print a warning message.
-            if not os.path.exists("./downloads/"):
-                os.makedirs("./downloads/")
-                fullfilename = os.path.join("./downloads/" + self.output_file)
-                urlretrieve(self.url, filename=fullfilename)
-            elif not os.path.exists(fullfilename):
-                fullfilename = os.path.join("./downloads/" + self.output_file)
-                urlretrieve(self.url, filename=fullfilename)
-            else:
-                print("File already exists!")
 
             self.df = pd.read_csv(fullfilename)
             self.df = self.df[(self.df["year"] >= 1970)]
@@ -168,6 +168,9 @@ class EnergyAnalysis:
             x = norm
             x["year"] = aux["year"]
             # plot
+            plt.title("Consumption in" + country, fontsize=14)
+            plt.xlabel("Year", fontsize=14)
+            plt.ylabel("Consumption", fontsize=14)
             plt.style.use("seaborn")
             x.plot.area(x="year")
             plt.show()
