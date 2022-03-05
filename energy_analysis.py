@@ -3,7 +3,9 @@ import os  # we want python to be able to read what we have in our hard drive
 
 import pandas as pd
 
+from matplotlib import cm
 import matplotlib.pyplot as plt
+
 import seaborn as sns
 
 
@@ -155,24 +157,27 @@ class EnergyAnalysis:
         """
         if country in self.list_countries():
             aux = self.df[(self.df["country"] == country)]
+            aux = aux[(aux["year"] <= 2019)]
             # selects the "_consumption" columns
             cols = [col for col in self.df.columns if "_consumption" in col]
+            cols.remove("renewables_consumption")
+            cols.remove("fossil_fuel_consumption")
+            cols.remove("primary_energy_consumption")
 
             aux = aux.fillna(value=0)
 
             norm = aux[cols]
-            norm
             # normalize the consumptions values to percentages
             if normalize:
                 norm[cols] = norm[cols].apply(lambda x: (x / x.sum()) * 100, axis=1)
             x = norm
             x["year"] = aux["year"]
             # plot
-            plt.title("Consumption in" + country, fontsize=14)
+            plt.style.use("seaborn")
+            x.plot.area(x="year", cmap=cm.get_cmap("Paired"))
+            plt.title("Consumption in " + country, fontsize=14)
             plt.xlabel("Year", fontsize=14)
             plt.ylabel("Consumption", fontsize=14)
-            plt.style.use("seaborn")
-            x.plot.area(x="year")
             plt.show()
         else:
             raise ValueError("Country does not exist.")
