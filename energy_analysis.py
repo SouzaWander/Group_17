@@ -32,8 +32,7 @@ class EnergyAnalysis:
         and reurns a pandas dataframe with the data
     """
 
-
-    def __init__(self, url: str, output_file: str):
+    def __init__(self):
         """
         Class constructor to inizialize the attributes of the class.
 
@@ -47,12 +46,12 @@ class EnergyAnalysis:
             The columns included in the correlation matrix
         """
 
-        self.url = url
-        self.output_file = output_file
+        self.url = "https://nyc3.digitaloceanspaces.com/owid-public/data/energy/owid-energy-data.csv"
+        self.output_file = "energy_data.csv"
         self.df = None
+        self.download_file()
 
-
-    #method 1 --> download file and read the csv to df attribute the pandas dataframe.
+    # method 1 --> download file and read the csv to df attribute the pandas dataframe.
     def download_file(self):
         """
         Downloads a file from the object.url address into your hard drive and read the dataset into the df attribute which it is a pandas dataframe.
@@ -73,9 +72,13 @@ class EnergyAnalysis:
         """
         try:
             # If file doesn't exist, download it. Else, print a warning message.
-            fullfilename = os.path.join("./downloads/"+self.output_file)
-            if not os.path.exists(fullfilename):
-                print(urlretrieve(self.url, filename=fullfilename))
+            if not os.path.exists("./downloads/"):
+                os.makedirs("./downloads/")
+                fullfilename = os.path.join("./downloads/" + self.output_file)
+                urlretrieve(self.url, filename=fullfilename)
+            elif not os.path.exists(fullfilename):
+                fullfilename = os.path.join("./downloads/" + self.output_file)
+                urlretrieve(self.url, filename=fullfilename)
             else:
                 print("File already exists!")
 
@@ -101,19 +104,35 @@ class EnergyAnalysis:
         -----------------
         Array
         """
-        region_list = ['Africa','Asia Pacific','CIS','Central America',
-       'Eastern Africa','Europe', 'Europe (other)','Middle Africa',
-       'Middle East',
-       'North America', 'OPEC',
-       'Other Asia & Pacific', 'Other CIS', 'Other Caribbean',
-       'Other Middle East', 'Other Northern Africa',
-       'Other South America', 'Other Southern Africa',
-       'South & Central America','USSR','Western Africa', 'Western Sahara',
-       'World']
+        region_list = [
+            "Africa",
+            "Asia Pacific",
+            "CIS",
+            "Central America",
+            "Eastern Africa",
+            "Europe",
+            "Europe (other)",
+            "Middle Africa",
+            "Middle East",
+            "North America",
+            "OPEC",
+            "Other Asia & Pacific",
+            "Other CIS",
+            "Other Caribbean",
+            "Other Middle East",
+            "Other Northern Africa",
+            "Other South America",
+            "Other Southern Africa",
+            "South & Central America",
+            "USSR",
+            "Western Africa",
+            "Western Sahara",
+            "World",
+        ]
         return self.df[(~self.df["country"].isin(region_list))].country.unique()
 
     # method 3 -->
-    def show_consumption(self, country:str , normalize:bool):
+    def show_consumption(self, country: str, normalize: bool):
         """
         Plots the normalized or not normalized consumptions of the past years of a given country.
 
@@ -144,7 +163,7 @@ class EnergyAnalysis:
             norm = aux[cols]
             norm
             # normalize the consumptions values to percentages
-            if(normalize):
+            if normalize:
                 norm[cols] = norm[cols].apply(lambda x: (x / x.sum()) * 100, axis=1)
             x = norm
             x["year"] = aux["year"]
@@ -156,7 +175,7 @@ class EnergyAnalysis:
             raise ValueError("Country does not exist.")
 
     # method 4 -->
-    def consumption_country(self, countries):
+    def consumption_country(self, countries: str):
         """
         Select the Countries, sum up the total per year and plot it
 
@@ -174,38 +193,50 @@ class EnergyAnalysis:
         ---------
         object.consumption_country(["Switzerland", "Portugal", "Chile"])
         """
-        
 
-        #Create a list with all _consumption columns and create a new dataframe
-        consumption_list = self.df.filter(like='_consumption').columns
-        consumption_data = self.df[["country", "year",'biofuel_consumption','coal_consumption','fossil_fuel_consumption',
-        'gas_consumption', 'hydro_consumption', 'low_carbon_consumption',
-        'nuclear_consumption', 'oil_consumption', 'other_renewable_consumption',
-        'primary_energy_consumption', 'renewables_consumption',
-        'solar_consumption', 'wind_consumption']]
-        
-        #calculate the sum of all consumption per year
+        # Create a list with all _consumption columns and create a new dataframe
+        consumption_list = self.df.filter(like="_consumption").columns
+        consumption_data = self.df[
+            [
+                "country",
+                "year",
+                "biofuel_consumption",
+                "coal_consumption",
+                "fossil_fuel_consumption",
+                "gas_consumption",
+                "hydro_consumption",
+                "low_carbon_consumption",
+                "nuclear_consumption",
+                "oil_consumption",
+                "other_renewable_consumption",
+                "primary_energy_consumption",
+                "renewables_consumption",
+                "solar_consumption",
+                "wind_consumption",
+            ]
+        ]
+
+        # calculate the sum of all consumption per year
         consumption_data["total"] = consumption_data[consumption_list].sum(axis=1)
-        
-        #Create a dataframe for every country needed and drop NaN
+
+        # Create a dataframe for every country needed and drop NaN
         for i in countries:
             globals()[i] = consumption_data[consumption_data["country"] == i]
-            indexNames = globals()[i][globals()[i]['total'] < 1 ].index
-            globals()[i].drop(indexNames , inplace=True)
-            
-        #plot the total consumption
+            indexNames = globals()[i][globals()[i]["total"] < 1].index
+            globals()[i].drop(indexNames, inplace=True)
+
+        # plot the total consumption
         for i in countries:
             plt.plot(globals()[i]["year"], globals()[i]["total"], label=i)
-        plt.title('Consumption per Year', fontsize=14)
-        plt.xlabel('Year', fontsize=14)
-        plt.ylabel('Total Consumption', fontsize=14)
+        plt.title("Consumption per Year", fontsize=14)
+        plt.xlabel("Year", fontsize=14)
+        plt.ylabel("Total Consumption", fontsize=14)
         plt.grid(True)
         plt.legend()
         plt.show()
 
-    
     # method 5 -->
-    def gdp_country(self,countries):
+    def gdp_country(self, countries: str):
         """
         Select the Countries, and plot the gdp over the years
 
@@ -223,40 +254,39 @@ class EnergyAnalysis:
         ---------
         object.gdp_country(["Switzerland", "Portugal", "Chile"])
         """
-        
-        #Select the columns Country, Year and gdp and create a new dataframe
-        gdp_data = self.df[["country","year","gdp"]]
-        
-        
-        #Create a dataframe for every country needed and drop NaN
+
+        # Select the columns Country, Year and gdp and create a new dataframe
+        gdp_data = self.df[["country", "year", "gdp"]]
+
+        # Create a dataframe for every country needed and drop NaN
         for i in countries:
             globals()[i] = gdp_data[gdp_data["country"] == i]
-            gdp_data.dropna(subset = ["gdp"], inplace=True)
-            
-        #plot the total consumption
+            gdp_data.dropna(subset=["gdp"], inplace=True)
+
+        # plot the total consumption
         for i in countries:
             plt.plot(globals()[i]["year"], globals()[i]["gdp"], label=i)
-        plt.title('GDP per Year', fontsize=14)
-        plt.xlabel('Year', fontsize=14)
-        plt.ylabel('GDP per Year', fontsize=14)
+        plt.title("GDP per Year", fontsize=14)
+        plt.xlabel("Year", fontsize=14)
+        plt.ylabel("GDP per Year", fontsize=14)
         plt.grid(True)
         plt.legend()
         plt.show()
-    
+
     # method 6 -->
-    def gapminder(self,y):
-        
+    def gapminder(self, y: int):
+
         """
         Plots a scatter Plot comparing the Gdp of each country and its Total Energy Consumption of a given year.
         The population of each country can also be compared by the size of the data points.
-        
+
         Parameter
         _______________
-        
+
         year: int
         Year that we want to analyse countries' GDP and Total Energy Consumption
-        
-        
+
+
         Raises
         -----------------
         ValueError
@@ -265,21 +295,20 @@ class EnergyAnalysis:
         Returns
         -----------------
         Scatter plot
-        
+
         """
-    
-    
-        #From the Dataset only the columns of the problem were Selected
-        dataframe = self.df.filter(regex='year|country|population|consumption|gdp') 
 
-        dataframe['total_consumption']= dataframe[list(dataframe.filter(regex='_consumption'))].sum(axis=1)
+        # From the Dataset only the columns of the problem were Selected
+        dataframe = self.df.filter(regex="year|country|population|consumption|gdp")
 
+        dataframe["total_consumption"] = dataframe[
+            list(dataframe.filter(regex="_consumption"))
+        ].sum(axis=1)
 
-        #Define the size of the plot for better visualization
+        # Define the size of the plot for better visualization
         fig = plt.figure(figsize=(20, 15))
 
-        year = dataframe[dataframe['year'] == y]
-    
+        year = dataframe[dataframe["year"] == y]
 
         if type(y) != int:
             raise TypeError("Variable 'y' is not int.")
@@ -287,42 +316,62 @@ class EnergyAnalysis:
         else:
 
             # x-axis values
-            x = year['gdp']
+            x = year["gdp"]
             # y-axis values
-            y = year['total_consumption']
-            p = year['population']
-            #size = [2*n for n in range(len(p))]
-            size = year['population']
+            y = year["total_consumption"]
+            p = year["population"]
+            # size = [2*n for n in range(len(p))]
+            size = year["population"]
 
             # plotting points as a scatter plot
-            plt.scatter(x, y, label= "Population Size",edgecolors = 'black',marker= "o",lw = 1,
-                        c=year.population,s=year.population/2**18)
+            plt.scatter(
+                x,
+                y,
+                label="Population Size",
+                edgecolors="black",
+                marker="o",
+                lw=1,
+                c=year.population,
+                s=year.population / 2 ** 18,
+            )
 
-
-            plt.colorbar(label='Total Energy Consumption',shrink=1)
+            plt.colorbar(label="Total Energy Consumption", shrink=1)
             plt.tick_params(labelsize=20)
 
             # x-axis label
-            plt.xlabel('GDP',fontsize = 20)
+            plt.xlabel("GDP", fontsize=20)
             # x-axis label
-            plt.ylabel('Total Energy Consumption',fontsize = 20)
+            plt.ylabel("Total Energy Consumption", fontsize=20)
             # plot title
-            plt.title('Countries GDP and Energy Consumption in a given Year',fontsize = 20)
+            plt.title(
+                "Countries GDP and Energy Consumption in a given Year", fontsize=20
+            )
 
-            #Editing the Legend
+            # Editing the Legend
             pws = [500000, 10000000, 100000000, 1000000000]
             for pw in pws:
-                 plt.scatter([], [], s=pw/2**18, c='k',label=str(pw),cmap = 'viridis')
+                plt.scatter(
+                    [], [], s=pw / 2 ** 18, c="k", label=str(pw), cmap="viridis"
+                )
 
             h, l = plt.gca().get_legend_handles_labels()
-            plt.legend(h[1:], l[1:], labelspacing=1.9, title="Population", borderpad=0.9, 
-                        frameon=True ,framealpha=0.6, edgecolor="blue", facecolor="lightblue",fontsize=20,title_fontsize=25)
+            plt.legend(
+                h[1:],
+                l[1:],
+                labelspacing=1.9,
+                title="Population",
+                borderpad=0.9,
+                frameon=True,
+                framealpha=0.6,
+                edgecolor="blue",
+                facecolor="lightblue",
+                fontsize=20,
+                title_fontsize=25,
+            )
 
-
-
-            #Change the X and Y axis scale for better visualization
-            plt.xscale('log')
-            plt.yscale('log')
+            # Change the X and Y axis scale for better visualization
+            plt.xscale("log")
+            plt.yscale("log")
 
             plt.grid()
 
@@ -330,8 +379,4 @@ class EnergyAnalysis:
 
             f = plt.show()
 
-
-
         return f
-
-     
