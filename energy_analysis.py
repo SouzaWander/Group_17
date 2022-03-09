@@ -309,9 +309,8 @@ class EnergyAnalysis:
         # From the Dataset only the columns of the problem were Selected
         dataframe = self.df.filter(regex="year|country|population|consumption|gdp")
 
-        dataframe["total_consumption"] = dataframe[
-            list(dataframe.filter(regex="_consumption"))
-        ].sum(axis=1)
+        total_consumption = dataframe[list(dataframe.filter(regex='_consumption'))].sum(axis=1)
+        dataframe = dataframe.assign(total_consumption=total_consumption.values)
 
         # Define the size of the plot for better visualization
         fig = plt.figure(figsize=(20, 15))
