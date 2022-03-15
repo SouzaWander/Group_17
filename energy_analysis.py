@@ -387,3 +387,139 @@ class EnergyAnalysis:
             f = plt.show()
 
         return f
+    
+    # new method 4 -->
+    def consumption_country_2(self, countries: str):
+        """
+        Select the Countries, sum up the total consumption and emission per year and plot it on two different axes
+
+        Parameters
+        ------------
+        countries: list
+            A list with all countries to be analyzed
+
+        Returns
+        ---------
+        Plot with consumption, emmision and countries
+
+
+        Example
+        ---------
+        object.consumption_country(["Germany", "Russia", "China"])
+        """
+        for country in countries:
+            if country in self.list_countries():
+                pass
+            else:
+                raise ValueError(f"One of your selected countries ({country}) is not in the list for countries")
+                
+        if type(countries) != list:
+            raise ValueError("Input is not a list")
+        else:
+            # Ze's part
+            enriched_df = self.df
+            pd.set_option('display.max_columns', None)
+
+            # Create every type of emissions columns
+            biofuel_e = enriched_df['biofuel_consumption']*1e3*1450
+            coal_e= enriched_df['coal_consumption']*1e3*1000
+            gas_e= enriched_df['gas_consumption']*1e3*455
+            hydro_e= enriched_df['hydro_consumption']*1e3*90
+            nuclear_e = enriched_df['nuclear_consumption']*1e3*5.5
+            oil_e= enriched_df['oil_consumption']*1e3*1200
+            solar_e = enriched_df['solar_consumption']*1e3*53
+            wind_e= enriched_df['wind_consumption']*1e3*14
+
+            # Assign each
+            enriched_df = enriched_df.assign(biofuel_e=biofuel_e.values)
+            enriched_df = enriched_df.assign(coal_e=coal_e.values)
+            enriched_df = enriched_df.assign(gas_e=gas_e.values)
+            enriched_df = enriched_df.assign(hydro_e=hydro_e.values)
+            enriched_df = enriched_df.assign(nuclear_e=nuclear_e.values)
+            enriched_df = enriched_df.assign(oil_e=oil_e.values)
+            enriched_df = enriched_df.assign(solar_e=solar_e.values)
+            enriched_df = enriched_df.assign(wind_e=wind_e.values)
+
+            # Sum All different types of Emissions 
+            enriched_df['Total_Emissions'] = enriched_df[list(enriched_df.filter(regex='_e'))].sum(axis=1)
+
+            # Yannick's part
+            # Load the data into Dataframe
+            df = self.df
+
+            # Create a list with all _consumption columns and create a new dataframe
+            consumption_list = self.df.filter(like="_consumption").columns
+            consumption_data = self.df[
+                [
+                    "country",
+                    "year",
+                    "biofuel_consumption",
+                    "coal_consumption",
+                    "fossil_fuel_consumption",
+                    "gas_consumption",
+                    "hydro_consumption",
+                    "low_carbon_consumption",
+                    "nuclear_consumption",
+                    "oil_consumption",
+                    "other_renewable_consumption",
+                    "primary_energy_consumption",
+                    "renewables_consumption",
+                    "solar_consumption",
+                    "wind_consumption",
+                ]
+            ]
+
+            # calculate the sum of all consumption per year and add the total Emissions to the file
+            consumption_data["total_consumption"] = consumption_data[consumption_list].sum(axis=1)
+            consumption_data['Total_Emissions'] = enriched_df[list(enriched_df.filter(regex='_e'))].sum(axis=1)
+
+            # Creat a Dataframe for every Country in list "Countries" and delete the last line (51) if we have data from 2020
+            for i in countries:
+                globals()[i] = consumption_data[consumption_data["country"] == i]
+
+                if len(globals()[i]) > 51:
+                    n = 1
+                    globals()[i].drop(globals()[i].tail(n).index, inplace = True)
+
+            # Create two empyt list and fill it with the adjusted Country names from the list "Countries"
+            df_names_consumption = []
+            df_names_emission = []
+
+            for country in countries:
+                consumption = country + "_Consumption"
+                emission = country + "_Emission"
+                df_names_consumption.append(consumption)
+                df_names_emission.append(emission)
+
+            # Set up the plot
+            fig = plt.figure(figsize=(17, 12))
+            ax = fig.add_subplot()
+
+            # Create a list for the legend
+            lns = list()
+
+            # Create dataframes for every country and axes
+            for a,b in zip(df_names_consumption,countries):
+                t = globals()[b]["year"]
+                globals()[a] = globals()[b]["total_consumption"]
+                [a] = ax.plot(t, globals()[a], '-', label = f"Total Consumption {a}")
+                lns.append(a)
+
+            ax2 = ax.twinx()
+
+            for a,b in zip(df_names_emission,countries):
+                globals()[a] = globals()[b]["Total_Emissions"]
+                [a] = ax2.plot(t, globals()[a], '--', label = f"Total Emissions {a}")
+                lns.append(a)
+
+            # Create the legend
+            labs = [l.get_label() for l in lns]
+            ax.legend(lns, labs, loc=0)
+
+            # Plot the result
+            ax.grid()
+            ax.set_xlabel("Year")
+            ax.set_ylabel("Total Consumption of a country (in terawatt-hours)")
+            ax2.set_ylabel("Total Emissions of a country (in tonnes of CO2)")
+            plt.xlim(1985,2019)
+            plt.show()
