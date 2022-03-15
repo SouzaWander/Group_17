@@ -289,7 +289,7 @@ class EnergyAnalysis:
         The population of each country can also be compared by the size of the data points.
 
         Parameter
-        _______________
+        ________________
 
         year: int
         Year that we want to analyse countries' GDP and Total Energy Consumption
@@ -303,7 +303,12 @@ class EnergyAnalysis:
         Returns
         -----------------
         Scatter plot
-
+        
+        How to use it:
+        ________________
+        
+        object.gapminder(2010)
+        
         """
 
         # From the Dataset only the columns of the problem were Selected
@@ -385,6 +390,150 @@ class EnergyAnalysis:
             # function to show the plot
 
             f = plt.show()
+
+        return f
+    
+    # Final Method
+    
+    def Emissions_Consumption(self,y):
+
+        """
+        Plots a scatter Plot comparing the Total Emissions of each country and its Total Energy Consumption of a given year.
+        The population of each country can also be compared by the size of the data points.
+
+        Parameter
+        _______________
+
+        year: int
+        Year that we want to analyse countries' Total Emissons and Total Energy Consumption
+        
+        Raises
+        -----------------
+        
+        ValueError
+        If the input given is not an 'int'
+
+        Returns
+        -----------------
+        
+        Scatter plot
+        
+        How to use it:
+        
+        object.Emissions_Consumption(2010)
+        
+        Quick Notes about the Scales of X & Y Axis
+        ________________
+        
+        X Axis
+        
+        Eg: 0.2 * 1e11 = 20 000 000 000 Tonnes of CO2 emissions
+        
+        Y Axis
+        
+        Eg: 100 000 = 100 000 of Energy Consumed Tera-Watts
+        
+        """
+
+
+        #From the Dataset only the columns of the problem were Selected
+        dataframe = self.df.filter(regex='year|country|population|consumption')
+
+
+        #Create new columns of each type of Emission
+        biofuel_e = dataframe['biofuel_consumption']*1e3*1450
+        coal_e= dataframe['coal_consumption']*1e3*1000
+        gas_e= dataframe['gas_consumption']*1e3*455
+        hydro_e= dataframe['hydro_consumption']*1e3*90
+        nuclear_e = dataframe['nuclear_consumption']*1e3*5.5
+        oil_e= dataframe['oil_consumption']*1e3*1200
+        solar_e = dataframe['solar_consumption']*1e3*53
+        wind_e= dataframe['wind_consumption']*1e3*14
+
+        dataframe = dataframe.assign(biofuel_e=biofuel_e.values)
+        dataframe = dataframe.assign(coal_e=coal_e.values)
+        dataframe = dataframe.assign(gas_e=gas_e.values)
+        dataframe = dataframe.assign(hydro_e=hydro_e.values)
+        dataframe = dataframe.assign(nuclear_e=nuclear_e.values)
+        dataframe = dataframe.assign(oil_e=oil_e.values)
+        dataframe = dataframe.assign(solar_e=solar_e.values)
+        dataframe = dataframe.assign(wind_e=wind_e.values)
+        
+        #Here we Sum all the types of Consumptions and create a new column out of it
+
+        dataframe['total_consumption']= dataframe[list(dataframe.filter(regex='consumption'))].sum(axis=1)
+        
+        #Here we Sum all the types of Emissions and create a new column out of it
+        dataframe['Total_Emissions']= dataframe[list(dataframe.filter(regex='_e'))].sum(axis=1)
+
+        #Define the size of the plot for better visualization
+        fig = plt.figure(figsize=(20, 15))
+
+        year = dataframe[dataframe['year'] == y]
+
+        #Raise error if the input of the Method is not an integer
+        if type(y) != int:
+            raise TypeError("Variable 'y' is not int.")
+
+        #Plot a Scatter plot if Otherwise
+        else:
+            # x-axis values
+            x = year['Total_Emissions']
+            # y-axis values
+            y = year['total_consumption']
+            p = year['population']
+            n = year['country']
+    
+            size = year['population']
+
+            # plotting points as a scatter plot
+            
+            plt.scatter(x, y, label= "Population Size",edgecolors = 'black',marker= "o",lw = 1,
+                        c=year.population,s=year.population/2**19)
+
+
+            plt.colorbar(label='Total Energy Consumption',shrink=1)
+            plt.tick_params(labelsize=20)
+
+            # x-axis label
+            plt.xlabel('Total Emissions',fontsize = 20)
+            # x-axis label
+            plt.ylabel('Total Energy Consumption',fontsize = 20)
+            # plot title
+            plt.title('Countries Emissions and Energy Consumption in a given Year',fontsize = 20)
+
+            #Editing the Legend
+            pws = [500000, 10000000, 100000000, 1000000000]
+            for pw in pws:
+                 plt.scatter([], [], s=pw/2**19, c='k',label=str(pw),cmap = 'viridis')
+                    
+
+
+            h, l = plt.gca().get_legend_handles_labels()
+            plt.legend(h[1:], l[1:], labelspacing=1.9, title="Population", borderpad=0.9, 
+                        frameon=True ,framealpha=0.6, edgecolor="blue", facecolor="lightblue",fontsize=20,title_fontsize=25)
+
+
+            #Limit the Axis to fit all the Data Points
+        
+            plt.ylim([-20000,500000])
+        
+            plt.xlim([-2000000,1.29e11])
+            
+            #Change the X and Y axis scale for better visualization
+            plt.xscale('linear')
+            plt.yscale('linear')
+
+            #Add background gridlines for better orientation
+            plt.grid()
+            
+           
+
+            #Function to show the plot
+
+            f = plt.show()
+
+
 
         return f
     
