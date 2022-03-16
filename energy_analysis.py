@@ -318,7 +318,7 @@ class EnergyAnalysis:
         dataframe = dataframe.assign(total_consumption=total_consumption.values)
 
         # Define the size of the plot for better visualization
-        fig = plt.figure(figsize=(20, 15))
+        fig = plt.figure(figsize=(15, 10))
 
         year = dataframe[dataframe["year"] == y]
 
@@ -467,7 +467,7 @@ class EnergyAnalysis:
         dataframe['Total_Emissions']= dataframe[list(dataframe.filter(regex='_e'))].sum(axis=1)
 
         #Define the size of the plot for better visualization
-        fig = plt.figure(figsize=(20, 15))
+        fig = plt.figure(figsize=(15, 10))
 
         year = dataframe[dataframe['year'] == y]
 
