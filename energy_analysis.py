@@ -660,67 +660,67 @@ class EnergyAnalysis:
             self.df['total_emissions'] = self.df[list(self.df.filter(regex='_e'))].sum(axis=1)
 
 
-        def relevant_and_total_consumption(self):
-            self.df.drop(columns =["renewables_consumption","fossil_fuel_consumption","primary_energy_consumption"], inplace=True)
-            self.df["total_consumption"] = self.df[list(self.df.filter(regex='_consumption'))].sum(axis=1).values
-            print(self.df["total_consumption"])
+    def relevant_and_total_consumption(self):
+        self.df.drop(columns =["renewables_consumption","fossil_fuel_consumption","primary_energy_consumption"], inplace=True)
+        self.df["total_consumption"] = self.df[list(self.df.filter(regex='_consumption'))].sum(axis=1).values
+        print(self.df["total_consumption"])
 
 
-        def forecast(self, n_periods:int, contry_code:str):
+    def forecast(self, n_periods:int, contry_code:str):
 
-            aux = self.df[(self.df["iso_code"] == contry_code)]
+        aux = self.df[(self.df["iso_code"] == contry_code)]
 
-            data = aux["total_consumption"]
-            x = aux["year"]
+        data = aux["total_consumption"]
+        x = aux["year"]
 
-            data2 = aux["total_emissions"]
-            x2 = aux["year"]
+        data2 = aux["total_emissions"]
+        x2 = aux["year"]
 
-            model_fit = auto_arima(data,
-                              start_p = 1,
-                              start_q = 1,
-                              max_p = 3,
-                              max_q = 3,
-                              m = 12,
-                              start_P = 0,
-                              seasonal = True,
-                              d = None,
-                              D = 1,
-                              trace = True,
-                              error_action ='ignore',   # Ignore incompatible settings
-                              suppress_warnings = True,
-                              stepwise = True)
+        model_fit = auto_arima(data,
+                          start_p = 1,
+                          start_q = 1,
+                          max_p = 3,
+                          max_q = 3,
+                          m = 12,
+                          start_P = 0,
+                          seasonal = True,
+                          d = None,
+                          D = 1,
+                          trace = True,
+                          error_action ='ignore',   # Ignore incompatible settings
+                          suppress_warnings = True,
+                          stepwise = True)
 
 
-            model_fit2 = auto_arima(data2,
-                              start_p = 1,
-                              start_q = 1,
-                              max_p = 3,
-                              max_q = 3,
-                              m = 12,
-                              start_P = 1,
-                              seasonal = True,
-                              d = None,
-                              D = 1,
-                              trace = True,
-                              error_action ='ignore',   # Ignore incompatible settings
-                              suppress_warnings = True,
-                              stepwise = True)
+        model_fit2 = auto_arima(data2,
+                          start_p = 1,
+                          start_q = 1,
+                          max_p = 3,
+                          max_q = 3,
+                          m = 12,
+                          start_P = 1,
+                          seasonal = True,
+                          d = None,
+                          D = 1,
+                          trace = True,
+                          error_action ='ignore',   # Ignore incompatible settings
+                          suppress_warnings = True,
+                          stepwise = True)
 
-            forecast_data = model_fit.predict(n_periods)
+        forecast_data = model_fit.predict(n_periods)
 
-            forecast_index = [n+2019 for n in range(n_periods)]
-            forecast_index = pd.to_datetime(forecast_index, format="%Y")
+        forecast_index = [n+2019 for n in range(n_periods)]
+        forecast_index = pd.to_datetime(forecast_index, format="%Y")
 
-            forecast_data2 = model_fit2.predict(n_periods)
+        forecast_data2 = model_fit2.predict(n_periods)
 
-            forecast_index2 = [n+2019 for n in range(n_periods)]
-            forecast_index2 = pd.to_datetime(forecast_index2, format="%Y")
+        forecast_index2 = [n+2019 for n in range(n_periods)]
+        forecast_index2 = pd.to_datetime(forecast_index2, format="%Y")
 
-            plt.subplot(1,2,1)
-            plt.plot(x,data)
-            plt.plot(forecast_index,forecast_data)
+        plt.subplot(1,2,1)
+        plt.plot(x,data)
+        plt.plot(forecast_index,forecast_data)
 
-            plt.subplot(1,2,2)
-            plt.plot(x2,data2)
-            plt.plot(forecast_index2,forecast_data2)
+        plt.subplot(1,2,2)
+        plt.plot(x2,data2)
+        plt.plot(forecast_index2,forecast_data2)
