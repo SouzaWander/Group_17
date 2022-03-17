@@ -18,11 +18,11 @@ sys.path.insert(0, os.path.abspath('../functions/'))
 # -- Project information -----------------------------------------------------
 
 project = 'Energy Analysis'
-copyright = '2022, Wander'
+copyright = '2022, Wander Souza, Jose Botelho Sousa, Yannick Schad'
 author = 'Wander Souza, Jose Botelho Sousa, Yannick Schad'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '1.0'
 
 
 # -- General configuration ---------------------------------------------------
