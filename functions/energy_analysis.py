@@ -58,13 +58,13 @@ class EnergyAnalysis:
         """
         Downloads a file from the object.url address into your hard drive and read the dataset into the df attribute which it is a pandas dataframe.
         Parameters
-        -----------
+        ----------------
         None
         Returns
-        ---------
+        ----------------
         dataset: pandas dataframe
         Example
-        ---------
+        ----------------
         object.download_file()
         """
         fullfilename = os.path.join("./downloads/" + self.output_file)
@@ -92,10 +92,10 @@ class EnergyAnalysis:
         ----------------
         None
         Raises
-        -----------------
+        ----------------
         None
         Returns
-        -----------------
+        ----------------
         Array
         """
         region_list = [
@@ -136,11 +136,11 @@ class EnergyAnalysis:
         normalize: bool
         Option if we want or not to normalize the consuption data.
         Raises
-        -----------------
+        ----------------
         ValueError
         If the country is not present on teh dataset
         Returns
-        -----------------
+        ----------------
         None
         """
         if country in self.list_countries():
@@ -162,7 +162,7 @@ class EnergyAnalysis:
             x.plot.area(x="year", cmap=cm.get_cmap("Paired"))
             plt.title("Consumption in " + country, fontsize=14)
             plt.xlabel("Year", fontsize=14)
-            plt.ylabel("Consumption", fontsize=14)
+            plt.ylabel("Consumption(in terawatt-hours)", fontsize=14)
             plt.show()
         else:
             raise ValueError("Country does not exist.")
@@ -172,14 +172,14 @@ class EnergyAnalysis:
         """
         Select the Countries, sum up the total per year and plot it
         Parameters
-        ------------
+        ----------------
         countries: list
             A list with all countries to be analyzed
         Returns
-        ---------
+        ----------------
         Plot with consumption and countries
         Example
-        ---------
+        ----------------
         object.consumption_country(["Switzerland", "Portugal", "Chile"])
         """
 
@@ -215,7 +215,7 @@ class EnergyAnalysis:
             plt.plot(globals()[i]["year"], globals()[i]["total_consumption"], label=i)
         plt.title("Consumption per Year", fontsize=14)
         plt.xlabel("Year", fontsize=14)
-        plt.ylabel("Total Consumption", fontsize=14)
+        plt.ylabel("Total Consumption (in terawatt-hours)", fontsize=14)
         plt.grid(True)
         plt.legend()
         plt.show()
@@ -225,14 +225,14 @@ class EnergyAnalysis:
         """
         Select the Countries, and plot the gdp over the years
         Parameters
-        ------------
+        ----------------
         countries: list
             A list with all countries to be analyzed
         Returns
-        ---------
+        ----------------
         Plot with gdp and countries
         Example
-        ---------
+        ----------------
         object.gdp_country(["Switzerland", "Portugal", "Chile"])
         """
 
@@ -261,18 +261,18 @@ class EnergyAnalysis:
         Plots a scatter Plot comparing the Gdp of each country and its Total Energy Consumption of a given year.
         The population of each country can also be compared by the size of the data points.
         Parameter
-        ________________
+        ----------------
         year: int
         Year that we want to analyse countries' GDP and Total Energy Consumption
         Raises
-        -----------------
+        ----------------
         ValueError
         If the input given is not an 'int'
         Returns
-        -----------------
+        ----------------
         Scatter plot
-        How to use it:
-        ________________
+        Example:
+        ----------------
         object.gapminder(2010)
         """
 
@@ -280,7 +280,7 @@ class EnergyAnalysis:
         dataframe = self.df.filter(
             regex="year|country|population|consumption|gdp|total_consumption"
         )
-        dataframe=dataframe.fillna(value=0)
+        dataframe = dataframe.fillna(value=0)
 
         # Define the size of the plot for better visualization
         fig = plt.figure(figsize=(15, 10))
@@ -289,7 +289,7 @@ class EnergyAnalysis:
             raise TypeError("Variable 'y' is not int.")
 
         else:
-            
+
             year = dataframe[dataframe["year"] == pd.to_datetime(y, format="%Y")]
 
             # x-axis values
@@ -310,16 +310,18 @@ class EnergyAnalysis:
                 lw=1,
                 c=year.population,
                 s=year.population / 2 ** 18,
-                cmap="viridis"
+                cmap="viridis",
             )
 
-            plt.colorbar(label="Total Energy Consumption", shrink=1)
+            plt.colorbar(
+                label="Total Energy Consumption (in terawatt-hours) ", shrink=1
+            )
             plt.tick_params(labelsize=20)
 
             # x-axis label
             plt.xlabel("GDP", fontsize=20)
             # x-axis label
-            plt.ylabel("Total Energy Consumption", fontsize=20)
+            plt.ylabel("Total Energy Consumption (in terawatt-hours)", fontsize=20)
             # plot title
             plt.title(
                 "Countries GDP and Energy Consumption in a given Year", fontsize=20
@@ -366,21 +368,24 @@ class EnergyAnalysis:
         """
         Plots a scatter Plot comparing the Total Emissions of each country and its Total Energy Consumption of a given year.
         The population of each country can also be compared by the size of the data points.
+
         Parameter
-        _______________
+        ----------------
         year: int
         Year that we want to analyse countries' Total Emissons and Total Energy Consumption
+
         Raises
-        -----------------
+        ----------------
         ValueError
         If the input given is not an 'int'
+
         Returns
-        -----------------
+        ----------------
         Scatter plot
         How to use it:
         object.Emissions_Consumption(2010)
         Quick Notes about the Scales of X & Y Axis
-        ________________
+        ----------------
         X Axis
         Eg: 0.2 * 1e11 = 20 000 000 000 Tonnes of CO2 emissions
         Y Axis
@@ -425,16 +430,16 @@ class EnergyAnalysis:
                 lw=1,
                 c=year.population,
                 s=year.population / 2 ** 19,
-                cmap="viridis"
+                cmap="viridis",
             )
 
             plt.colorbar(label="Total Energy Consumption", shrink=1)
             plt.tick_params(labelsize=20)
 
             # x-axis label
-            plt.xlabel("Total Emissions", fontsize=20)
+            plt.xlabel("Total Emissions (in tonnes of CO2)", fontsize=20)
             # x-axis label
-            plt.ylabel("Total Energy Consumption", fontsize=20)
+            plt.ylabel("Total Energy Consumption (in terawatt-hours)", fontsize=20)
             # plot title
             plt.title(
                 "Countries Emissions and Energy Consumption in a given Year",
@@ -487,14 +492,16 @@ class EnergyAnalysis:
         """
         Select the Countries, sum up the total consumption and emission per year and plot it on two different axes
         Parameters
-        ------------
+        ----------------
         countries: list
             A list with all countries to be analyzed
+
         Returns
-        ---------
+        ----------------
         Plot with consumption, emmision and countries
+
         Example
-        ---------
+        ----------------
         object.consumption_country(["Germany", "Russia", "China"])
         """
         for country in countries:
@@ -582,20 +589,23 @@ class EnergyAnalysis:
             ax.set_xlabel("Year")
             ax.set_ylabel("Total Consumption of a country (in terawatt-hours)")
             ax2.set_ylabel("Total Emissions of a country (in tonnes of CO2)")
-            #plt.xlim(1985, 2019)
+            # plt.xlim(1985, 2019)
             plt.show()
 
     def enrich_with_emission(self):
         """
         Enrinches the dataset with the informatio about the emissions of each energy resource
         and compute the total consuption in each row.
-        ------------
+        Parameters
+        ----------------
         None
+
         Returns
-        ---------
+        ----------------
         None
+
         Example
-        ---------
+        ----------------
         object.enrich_with_emission()
         """
 
@@ -633,12 +643,16 @@ class EnergyAnalysis:
     def relevant_and_total_consumption(self):
         """
         Removes the irrelevant and duplicated consumption data, and computes the total consumption.
-        ------------
-        Returns
-        ---------
+        Parameters
+        ----------------
         None
+
+        Returns
+        ----------------
+        None
+
         Example
-        ---------
+        ----------------
         object.relevant_and_total_consumption()
         """
         self.df.drop(
@@ -653,19 +667,19 @@ class EnergyAnalysis:
         self.df["total_consumption"] = (
             self.df[list(self.df.filter(regex="_consumption"))].sum(axis=1).values
         )
-     
 
     def forecast(self, n_periods: int, contry_code: str):
         """
         This method uses an ARIMA family algorithm to make and plot predictions about the total emission and total consumption values of a given country.
-        ------------
+        Parameters
+        ----------------
         n_periods: Number of prediction periods,
         contry_code: Country identifier
         Returns
-        ---------
+        ----------------
         None
         Example
-        ---------
+        ----------------
         object.forecas(5,"PRT")
         """
         aux = self.df[(self.df["iso_code"] == contry_code)]
@@ -724,13 +738,13 @@ class EnergyAnalysis:
         plt.title("Total Consumptions", fontsize=14)
 
         plt.xlabel("Year", fontsize=14)
-        plt.ylabel("Consumption", fontsize=14)
+        plt.ylabel("Consumption (in terawatt-hours)", fontsize=14)
         plt.plot(x, data)
         plt.plot(forecast_index, forecast_data)
 
         plt.subplot(1, 2, 2)
         plt.title("Total Emissions", fontsize=14)
         plt.xlabel("Year", fontsize=14)
-        plt.ylabel("Emissions", fontsize=14)
+        plt.ylabel("Emissions (in tones of CO2)", fontsize=14)
         plt.plot(x2, data2)
         plt.plot(forecast_index2, forecast_data2)
