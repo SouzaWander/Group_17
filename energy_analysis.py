@@ -396,7 +396,7 @@ class EnergyAnalysis:
         # Define the size of the plot for better visualization
         fig = plt.figure(figsize=(15, 10))
 
-        year = dataframe[dataframe["year"] == y]
+        year = dataframe[dataframe["year"] == pd.to_datetime(y, format="%Y")]
 
         # Raise error if the input of the Method is not an integer
         if type(y) != int:
@@ -478,7 +478,7 @@ class EnergyAnalysis:
 
             f = plt.show()
 
-        return f
+        return x,y,size
 
     # new method 4 -->
     def consumption_country_2(self, countries: str):
@@ -527,6 +527,8 @@ class EnergyAnalysis:
                     "other_renewable_consumption",
                     "solar_consumption",
                     "wind_consumption",
+                    "total_consumption",
+                    "total_emissions",
                 ]
             ]
 
@@ -578,7 +580,7 @@ class EnergyAnalysis:
             ax.set_xlabel("Year")
             ax.set_ylabel("Total Consumption of a country (in terawatt-hours)")
             ax2.set_ylabel("Total Emissions of a country (in tonnes of CO2)")
-            plt.xlim(1985, 2019)
+            #plt.xlim(1985, 2019)
             plt.show()
 
     def enrich_with_emission(self):
