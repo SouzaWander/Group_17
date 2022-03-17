@@ -482,8 +482,8 @@ class EnergyAnalysis:
 
         return f
 
-    # new method 4 -->
-    def consumption_country_2(self, countries: str):
+    # new method 4 (adjusted method 4 from the first day) -->
+    def consumption_emission_country(self, countries: str):
         """
         Select the Countries, sum up the total consumption and emission per year and plot it on two different axes
         Parameters
@@ -553,7 +553,7 @@ class EnergyAnalysis:
                 df_names_emission.append(emission)
 
             # Set up the plot
-            fig = plt.figure(figsize=(17, 12))
+            fig = plt.figure(figsize=(13, 10))
             ax = fig.add_subplot()
 
             # Create a list for the legend
