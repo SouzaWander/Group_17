@@ -285,15 +285,13 @@ class EnergyAnalysis:
         # Define the size of the plot for better visualization
         fig = plt.figure(figsize=(15, 10))
 
-        year = dataframe[dataframe["year"] == pd.to_datetime(y, format="%Y")]
-
         if type(y) != int:
             raise TypeError("Variable 'y' is not int.")
 
         else:
-            #Here we filter the years 
-            year = dataframe[dataframe["year"] == pd.to_datetime(y, format="%Y")]
             
+            year = dataframe[dataframe["year"] == pd.to_datetime(y, format="%Y")]
+
             # x-axis values
             x = year["gdp"]
             # y-axis values
@@ -312,6 +310,7 @@ class EnergyAnalysis:
                 lw=1,
                 c=year.population,
                 s=year.population / 2 ** 18,
+                cmap="viridis"
             )
 
             plt.colorbar(label="Total Energy Consumption", shrink=1)
@@ -358,7 +357,7 @@ class EnergyAnalysis:
 
             f = plt.show()
 
-        return y,x,size
+        return f
 
     # Final Method
 
@@ -426,6 +425,7 @@ class EnergyAnalysis:
                 lw=1,
                 c=year.population,
                 s=year.population / 2 ** 19,
+                cmap="viridis"
             )
 
             plt.colorbar(label="Total Energy Consumption", shrink=1)
@@ -480,7 +480,7 @@ class EnergyAnalysis:
 
             f = plt.show()
 
-        return x,y,size
+        return f
 
     # new method 4 -->
     def consumption_country_2(self, countries: str):
@@ -653,7 +653,7 @@ class EnergyAnalysis:
         self.df["total_consumption"] = (
             self.df[list(self.df.filter(regex="_consumption"))].sum(axis=1).values
         )
-        print(self.df["total_consumption"])
+     
 
     def forecast(self, n_periods: int, contry_code: str):
         """
