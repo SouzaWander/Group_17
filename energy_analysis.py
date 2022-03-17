@@ -291,7 +291,9 @@ class EnergyAnalysis:
             raise TypeError("Variable 'y' is not int.")
 
         else:
-
+            #Here we filter the years 
+            year = dataframe[dataframe["year"] == pd.to_datetime(y, format="%Y")]
+            
             # x-axis values
             x = year["gdp"]
             # y-axis values
